@@ -10,6 +10,10 @@ import { registrarEnEatsy, quitarDeEatsy } from './eatsy.js';
 
 const clave = (bytes = 24) => crypto.randomBytes(bytes).toString('hex');
 
+// Coolify solo acepta letras, números, espacios y algo de puntuación en la descripción.
+const descripcion = (producto, nombre) => `${producto} - ${nombre}`
+  .replace(/[^\p{L}\p{N} \-_.,!?()'"+=*/@&]/gu, '').slice(0, 200);
+
 /** "Mini Market Sur" -> "minimarketsur" (solo letras, números y guiones). */
 export function slugDesde(texto) {
   return String(texto || '')
@@ -65,7 +69,7 @@ async function desplegarNegocio(n, adminPassword) {
     await negocios.actualizar(n.id, { estado: 'creando app' });
     const app = await coolify.crearAppGit({
       name: `eatsy-${n.slug}`,
-      description: `Eatsy · ${n.nombre}`,
+      description: descripcion('Eatsy', n.nombre),
       git_repository: config.eatsy.repo,
       git_branch: 'main',
       build_pack: 'nixpacks',
@@ -104,7 +108,7 @@ async function desplegarNegocio(n, adminPassword) {
     await negocios.actualizar(n.id, { estado: 'creando app' });
     const app = await coolify.crearAppDockerfile({
       name: `stockify-${n.slug}`,
-      description: `Stockify · ${n.nombre}`,
+      description: descripcion('Stockify', n.nombre),
       dockerfile: Buffer.from(dockerfileStockify()).toString('base64'),
       ports_exposes: '8080',
       domains: dominio,
