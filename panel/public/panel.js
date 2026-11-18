@@ -128,7 +128,11 @@ $('#lista').addEventListener('click', async (e) => {
   b.disabled = true;
   try {
     await api('POST', `/negocios/${n.id}/${b.dataset.acc}`);
-    toast({ suspender: 'Negocio suspendido.', reactivar: 'Reactivando…', redesplegar: 'Redesplegando…' }[b.dataset.acc]);
+    toast({
+      suspender: 'Suspendiendo… la app deja de responder en alrededor de un minuto.',
+      reactivar: 'Reactivando… vuelve a estar disponible en unos segundos.',
+      redesplegar: 'Redesplegando con la última versión…',
+    }[b.dataset.acc]);
     cargar();
   } catch (ex) {
     toast(ex.message);
