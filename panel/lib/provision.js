@@ -2,9 +2,7 @@
 import crypto from 'node:crypto';
 import { config, RESERVADOS } from './config.js';
 import { coolify } from './coolify.js';
-import {
-  negocios, crearEsquemaPostgres, borrarEsquemaPostgres, crearBaseMysql, borrarBaseMysql,
-} from './db.js';
+import { negocios, crearEsquemaPostgres, borrarEsquemaPostgres } from './db.js';
 import { dockerfileStockify } from './stockify.js';
 import { registrarEnEatsy, quitarDeEatsy } from './eatsy.js';
 
@@ -103,7 +101,7 @@ async function desplegarNegocio(n, adminPassword) {
     await coolify.crearVolumen(uuid, `${uuid}-uploads`, '/app/uploads');
   } else {
     await negocios.actualizar(n.id, { estado: 'creando base' });
-    await crearBaseMysql(n.base, n.base_user, claveBase);
+    await crearEsquemaPostgres(n.base, n.base_user, claveBase);
 
     await negocios.actualizar(n.id, { estado: 'creando app' });
     const app = await coolify.crearAppDockerfile({
@@ -120,9 +118,11 @@ async function desplegarNegocio(n, adminPassword) {
     await coolify.ponerEnvs(uuid, {
       NODE_ENV: 'production',
       PORT: '8080',
-      DB_HOST: config.mysql.host,
-      DB_PORT: String(config.mysql.port),
-      DB_NAME: n.base,
+      DB_HOST: config.postgres.host,
+      DB_PORT: String(config.postgres.port),
+      DB_NAME: config.postgres.database,
+      DB_SCHEMA: n.base,
+      DB_SSL: 'false',
       DB_USER: n.base_user,
       DB_PASS: claveBase,
       JWT_SECRET: clave(32),
@@ -204,11 +204,9 @@ export async function eliminar(n) {
   if (n.app_uuid) {
     try { await coolify.eliminar(n.app_uuid); } catch (err) { if (!/404/.test(err.message)) throw err; }
   }
+  await borrarEsquemaPostgres(n.base, n.base_user);
   if (n.producto === 'eatsy') {
-    await borrarEsquemaPostgres(n.base, n.base_user);
     try { await quitarDeEatsy(urlDe(n.slug)); } catch (err) { console.warn('[baja] panel central de Eatsy:', err.message); }
-  } else {
-    await borrarBaseMysql(n.base, n.base_user);
   }
   await negocios.borrar(n.id);
 }

@@ -1,8 +1,6 @@
-// Conexiones a las bases del VPS:
-// - PostgreSQL: guarda los datos del panel (esquema "panel") y aloja un esquema por negocio de Eatsy.
-// - MySQL: aloja una base por negocio de Stockify.
+// Conexión al PostgreSQL del VPS: guarda los datos del panel (esquema "panel") y aloja
+// un esquema con su propio usuario por cada negocio (Eatsy: eatsy_<slug>, Stockify: stk_<slug>).
 import pg from 'pg';
-import mysql from 'mysql2/promise';
 import { config } from './config.js';
 
 export const pool = new pg.Pool({ ...config.postgres, max: 5 });
@@ -50,7 +48,7 @@ export const negocios = {
   borrar: (id) => pool.query('DELETE FROM panel.negocios WHERE id = $1', [id]),
 };
 
-// ---------- PostgreSQL: un esquema y un usuario propios por negocio de Eatsy ----------
+// ---------- Un esquema y un usuario propios por negocio ----------
 const ident = (s) => `"${s.replace(/"/g, '')}"`;
 const literal = (s) => `'${String(s).replace(/'/g, "''")}'`;
 
@@ -85,33 +83,5 @@ export async function borrarEsquemaPostgres(esquema, usuario) {
     }
   } finally {
     c.release();
-  }
-}
-
-// ---------- MySQL: una base y un usuario propios por negocio de Stockify ----------
-async function mysqlRoot() {
-  return mysql.createConnection({ host: config.mysql.host, port: config.mysql.port, user: 'root', password: config.mysql.rootPassword });
-}
-
-export async function crearBaseMysql(base, usuario, clave) {
-  const c = await mysqlRoot();
-  try {
-    await c.query(`CREATE DATABASE IF NOT EXISTS \`${base}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`);
-    await c.query('CREATE USER IF NOT EXISTS ?@\'%\' IDENTIFIED BY ?', [usuario, clave]);
-    await c.query('ALTER USER ?@\'%\' IDENTIFIED BY ?', [usuario, clave]);
-    await c.query(`GRANT ALL PRIVILEGES ON \`${base}\`.* TO ?@'%'`, [usuario]);
-    await c.query('FLUSH PRIVILEGES');
-  } finally {
-    await c.end();
-  }
-}
-
-export async function borrarBaseMysql(base, usuario) {
-  const c = await mysqlRoot();
-  try {
-    await c.query(`DROP DATABASE IF EXISTS \`${base}\``);
-    await c.query('DROP USER IF EXISTS ?@\'%\'', [usuario]);
-  } finally {
-    await c.end();
   }
 }

@@ -2,7 +2,7 @@
 
 Alta automática de negocios en el VPS: al crear uno (Eatsy o Stockify) el panel
 
-1. crea su base aislada (esquema + usuario propio en PostgreSQL para Eatsy, base + usuario propio en MySQL para Stockify),
+1. crea su base aislada: un esquema con usuario propio en PostgreSQL (`eatsy_<negocio>` o `stk_<negocio>`),
 2. crea la app en Coolify con el subdominio `https://<negocio>.pckairos.cloud` (HTTPS automático),
 3. carga sus variables y la despliega,
 4. (Eatsy) la agrega a "Todas mis instalaciones" del superadmin.

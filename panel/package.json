@@ -4,14 +4,15 @@
   "description": "Panel de Kairos: alta automática de negocios (Eatsy, Stockify) con su propio subdominio en el VPS.",
   "type": "module",
   "main": "server.js",
-  "engines": { "node": ">=22" },
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "express": "^5.1.0",
-    "mysql2": "^3.11.0",
     "pg": "^8.13.1"
   }
 }

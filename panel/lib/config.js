@@ -30,11 +30,6 @@ export const config = {
     password: requerida('PG_PASSWORD'),
     database: env.PG_DATABASE || 'apps',
   },
-  mysql: {
-    host: requerida('MYSQL_HOST'),
-    port: Number(env.MYSQL_PORT) || 3306,
-    rootPassword: requerida('MYSQL_ROOT_PASSWORD'),
-  },
   eatsy: {
     repo: env.EATSY_REPO || 'https://github.com/jairobandera/eatsy',
     principal: (env.EATSY_MAIN_URL || 'https://eatsy.pckairos.cloud').replace(/\/+$/, ''),
