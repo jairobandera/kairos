@@ -33,9 +33,19 @@ async function listaActual(api) {
 export async function registrarEnEatsy(nombre, url) {
   const api = await sesion();
   const lista = await listaActual(api);
-  if (lista.some((i) => i.url.replace(/\/+$/, '') === url)) return;
-  lista.push({ nombre, url });
-  await api('PUT', '/api/superadmin/instalaciones', { lista });
+  if (!lista.some((i) => i.url.replace(/\/+$/, '') === url)) {
+    lista.push({ nombre, url });
+    await api('PUT', '/api/superadmin/instalaciones', { lista });
+  }
+  // El nombre del negocio en la instalación nueva (por defecto dice "Eatsy"), vía el panel central.
+  const n = (await listaActual(api)).findIndex((i) => i.url.replace(/\/+$/, '') === url);
+  if (n < 0) return;
+  const { config: c } = await api('GET', `/api/superadmin/remota/${n}`);
+  if (c.negocio.nombre === nombre) return;
+  await api('PUT', `/api/superadmin/remota/${n}`, {
+    paquete: c.paquete, licencia: c.licencia, limites: c.limites, modulos: c.modulos,
+    negocio: { nombre: String(nombre).slice(0, 60), color: c.negocio.color },
+  });
 }
 
 export async function quitarDeEatsy(url) {
