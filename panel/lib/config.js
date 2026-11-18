@@ -16,6 +16,7 @@ export const config = {
     secreto: requerida('SESSION_SECRET'),
   },
   dominio: env.BASE_DOMAIN || 'pckairos.cloud',
+  proxyHost: env.PROXY_HOST || 'coolify-proxy',
   coolify: {
     url: (env.COOLIFY_URL || 'http://coolify:8080').replace(/\/+$/, ''),
     token: requerida('COOLIFY_TOKEN'),

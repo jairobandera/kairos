@@ -51,9 +51,9 @@ $('#btn-salir').addEventListener('click', async () => {
 // ---------- Lista ----------
 let filtro = 'todos';
 let lista = [];
-const EN_PROCESO = ['creando', 'creando base', 'creando app', 'desplegando'];
+const EN_PROCESO = ['creando', 'creando base', 'creando app', 'desplegando', 'activando https'];
 const TEXTO_ESTADO = {
-  creando: 'Preparando', 'creando base': 'Creando base', 'creando app': 'Creando app', desplegando: 'Desplegando',
+  creando: 'Preparando', 'creando base': 'Creando base', 'creando app': 'Creando app', desplegando: 'Desplegando', 'activando https': 'Activando HTTPS',
   activo: 'Activo', suspendido: 'Suspendido', error: 'Error',
 };
 
@@ -99,7 +99,7 @@ function pintar() {
       </div>
       <div class="neg-acc">${acciones.join('')}</div>
       ${proceso ? '<p class="muted small" style="grid-column:1/-1">Esto tarda unos minutos (crea la base, construye la app y saca el certificado HTTPS). Podés cerrar esta página.</p>' : ''}
-      ${n.estado === 'error' && n.error ? `<pre class="err">${esc(n.error)}</pre>` : ''}
+      ${n.error ? `<pre class="err">${esc(n.error)}</pre>` : ''}
     </article>`;
   }).join('');
 }

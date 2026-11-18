@@ -1,5 +1,6 @@
 // Alta, seguimiento, suspensión y baja de negocios.
 import crypto from 'node:crypto';
+import tls from 'node:tls';
 import { config, RESERVADOS } from './config.js';
 import { coolify } from './coolify.js';
 import { negocios, crearEsquemaPostgres, borrarEsquemaPostgres } from './db.js';
@@ -140,6 +141,7 @@ async function desplegarNegocio(n, adminPassword) {
   const deploy = await coolify.desplegar(uuid);
   await negocios.actualizar(n.id, { deploy_uuid: deploy });
   await esperarDespliegue(n.id, deploy);
+  await asegurarHttps(n, uuid);
 
   if (n.producto === 'eatsy') {
     try {
@@ -172,6 +174,43 @@ async function esperarDespliegue(id, deployUuid) {
   throw new Error('El despliegue tardó más de 20 minutos. Revisalo en Coolify.');
 }
 
+// ---------- HTTPS ----------
+// Traefik pide el certificado a Let's Encrypt al ver la app. Si Let's Encrypt falla
+// (pasa a veces con errores 500 temporales) Traefik no reintenta solo y el sitio queda
+// con su certificado por defecto ("No es seguro"). Lo revisamos y, si hace falta,
+// reiniciamos la app para que Traefik vuelva a pedirlo.
+function emisorCertificado(host) {
+  return new Promise((resolve) => {
+    const s = tls.connect({ host: config.proxyHost, port: 443, servername: host, rejectUnauthorized: false, timeout: 10_000 }, () => {
+      const cert = s.getPeerCertificate();
+      s.end();
+      resolve(cert?.issuer?.O || cert?.issuer?.CN || '');
+    });
+    s.on('error', () => resolve(''));
+    s.on('timeout', () => { s.destroy(); resolve(''); });
+  });
+}
+
+export const tieneHttps = async (slug) => /encrypt/i.test(await emisorCertificado(`${slug}.${config.dominio}`));
+
+async function asegurarHttps(n, uuid) {
+  const espera = (ms) => new Promise((r) => setTimeout(r, ms));
+  for (let intento = 0; intento < 4; intento++) {
+    if (intento > 0) {
+      await negocios.actualizar(n.id, { estado: 'activando https' });
+      try { await coolify.reiniciar(uuid); } catch (err) { console.warn(`[https ${n.slug}]`, err.message); }
+    }
+    for (let i = 0; i < 12; i++) {
+      await espera(10_000);
+      if (await tieneHttps(n.slug)) {
+        await negocios.actualizar(n.id, { estado: 'activo', error: null });
+        return;
+      }
+    }
+  }
+  await negocios.actualizar(n.id, { estado: 'activo', error: 'La app anda pero no se pudo obtener el certificado HTTPS. Probá "Redesplegar" en unos minutos.' });
+}
+
 /** Estado actual consultando a Coolify (para negocios ya creados). */
 export async function refrescarEstado(n) {
   if (!n.app_uuid || !['activo', 'suspendido', 'desplegando'].includes(n.estado)) return n;
@@ -196,7 +235,7 @@ export async function reactivar(n) {
 export async function redesplegar(n) {
   const deploy = await coolify.desplegar(n.app_uuid);
   await negocios.actualizar(n.id, { estado: 'desplegando', deploy_uuid: deploy, error: null });
-  esperarDespliegue(n.id, deploy).catch((err) => negocios.actualizar(n.id, { estado: 'error', error: String(err.message).slice(0, 1000) }));
+  esperarDespliegue(n.id, deploy).then(() => asegurarHttps(n, n.app_uuid)).catch((err) => negocios.actualizar(n.id, { estado: 'error', error: String(err.message).slice(0, 1000) }));
 }
 
 /** Borra la app, su volumen y su base. No se puede deshacer. */

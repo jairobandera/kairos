@@ -59,6 +59,7 @@ export const coolify = {
   },
   despliegue: (uuid) => api('GET', `/deployments/${uuid}`),
   iniciar: (uuid) => api('POST', `/applications/${uuid}/start`),
+  reiniciar: (uuid) => api('POST', `/applications/${uuid}/restart`),
   detener: (uuid) => api('POST', `/applications/${uuid}/stop`),
   eliminar: (uuid) => api('DELETE', `/applications/${uuid}?delete_configurations=true&delete_volumes=true&docker_cleanup=true&delete_connected_networks=false`),
 };
