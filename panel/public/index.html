@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Panel Kairos</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="theme-color" content="#0b0d14" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="panel.css" />
+</head>
+<body>
+  <!-- Login -->
+  <section id="vista-login" class="login" hidden>
+    <form id="form-login" class="login-card" autocomplete="on">
+      <div class="brand"><img src="favicon.svg" alt="" width="34" height="34" /><span>Panel Kairos</span></div>
+      <p class="muted">Alta y gestión de tus negocios.</p>
+      <label>Usuario<input name="usuario" autocomplete="username" required /></label>
+      <label>Clave<input name="clave" type="password" autocomplete="current-password" required /></label>
+      <p class="error" id="login-error" hidden></p>
+      <button class="btn" type="submit">Entrar</button>
+    </form>
+  </section>
+
+  <!-- Panel -->
+  <section id="vista-panel" hidden>
+    <header class="top">
+      <div class="wrap top-inner">
+        <div class="brand"><img src="favicon.svg" alt="" width="28" height="28" /><span>Panel Kairos</span></div>
+        <div class="top-actions">
+          <button class="btn" id="btn-nuevo">+ Nuevo negocio</button>
+          <button class="btn ghost" id="btn-salir">Salir</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <div class="head">
+        <div>
+          <h1>Tus negocios</h1>
+          <p class="muted">Cada negocio tiene su propio subdominio, su app y sus datos separados.</p>
+        </div>
+        <div class="filtros" role="tablist" aria-label="Filtrar por producto">
+          <button class="chip activo" data-filtro="todos">Todos</button>
+          <button class="chip" data-filtro="eatsy">Eatsy</button>
+          <button class="chip" data-filtro="stockify">Stockify</button>
+        </div>
+      </div>
+      <div id="lista" class="lista" aria-live="polite"></div>
+    </main>
+  </section>
+
+  <!-- Alta -->
+  <dialog id="dlg-nuevo">
+    <form id="form-nuevo" method="dialog">
+      <h2>Nuevo negocio</h2>
+      <fieldset class="productos">
+        <legend>Producto</legend>
+        <label class="prod eatsy"><input type="radio" name="producto" value="eatsy" checked /><span><b>Eatsy</b><small>Autopedido gastronómico</small></span></label>
+        <label class="prod stockify"><input type="radio" name="producto" value="stockify" /><span><b>Stockify</b><small>Facturación y stock</small></span></label>
+      </fieldset>
+      <label>Nombre del negocio<input name="nombre" required maxlength="80" placeholder="Ej: Minimarket" /></label>
+      <label>Subdominio
+        <div class="sub"><input name="slug" required maxlength="40" pattern="[a-z0-9]([a-z0-9-]*[a-z0-9])?" placeholder="minimarket" /><span>.<b class="dom">pckairos.cloud</b></span></div>
+        <small class="muted">Solo minúsculas, números y guiones.</small>
+      </label>
+      <label>Modo
+        <select name="modo">
+          <option value="produccion">Producción (vacío, listo para trabajar)</option>
+          <option value="demo">Demo (con datos de ejemplo)</option>
+        </select>
+      </label>
+      <div class="dos">
+        <label>Usuario administrador<input name="admin_user" required value="admin" maxlength="40" /></label>
+        <label>Clave del administrador
+          <div class="sub"><input name="admin_password" required minlength="8" /><button type="button" class="btn ghost mini" id="btn-generar">Generar</button></div>
+        </label>
+      </div>
+      <p class="muted small">Guardá la clave: después no se puede volver a ver desde el panel.</p>
+      <p class="error" id="nuevo-error" hidden></p>
+      <div class="acciones">
+        <button type="button" class="btn ghost" id="btn-cancelar">Cancelar</button>
+        <button type="submit" class="btn" id="btn-crear">Crear negocio</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Confirmar eliminación -->
+  <dialog id="dlg-borrar">
+    <form id="form-borrar" method="dialog">
+      <h2>Eliminar negocio</h2>
+      <p>Se borra la app, sus datos y su subdominio <b id="borrar-host"></b>. <b>No se puede deshacer.</b></p>
+      <label>Para confirmar, escribí el subdominio: <code id="borrar-slug"></code><input name="confirmar" autocomplete="off" required /></label>
+      <p class="error" id="borrar-error" hidden></p>
+      <div class="acciones">
+        <button type="button" class="btn ghost" id="btn-no-borrar">Cancelar</button>
+        <button type="submit" class="btn peligro">Eliminar para siempre</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" hidden></div>
+  <script src="panel.js" type="module"></script>
+</body>
+</html>
