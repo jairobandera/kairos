@@ -1,0 +1,73 @@
+/* Estilos de las páginas de cada servicio (se suman a styles.css) */
+.page { --accent: var(--brand); --accent2: var(--brand-2); }
+.back { color: var(--muted); font-size: .92rem; display: inline-flex; gap: 6px; align-items: center; }
+.back:hover { color: var(--text); }
+
+.p-hero { padding: 64px 0 40px; display: grid; grid-template-columns: 1fr 1.1fr; gap: 48px; align-items: center; }
+.p-hero .eyebrow { color: var(--accent); }
+.p-hero h1 { text-align: left; margin: 0 0 18px; max-width: none; font-size: clamp(2.2rem, 5vw, 3.6rem); }
+.p-hero h1 .grad { background: linear-gradient(120deg, var(--accent), var(--accent2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.p-hero .lead { margin: 0 0 28px; text-align: left; }
+.btn-accent { background: linear-gradient(135deg, var(--accent), var(--accent2)); box-shadow: 0 10px 30px -10px var(--accent); }
+.btn-accent:hover { box-shadow: 0 14px 34px -10px var(--accent); }
+.hero-cta.left { justify-content: flex-start; }
+.p-logo { width: 64px; height: 64px; border-radius: 18px; display: grid; place-items: center; margin-bottom: 18px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2)); box-shadow: 0 12px 30px -12px var(--accent); }
+.p-logo svg { width: 32px; height: 32px; fill: #fff; }
+.p-logo img { width: 52px; height: 52px; object-fit: contain; }
+
+/* Marco de navegador para capturas */
+.shot { margin: 0; border-radius: 14px; overflow: hidden; border: 1px solid var(--border); background: var(--surface);
+  box-shadow: 0 30px 70px -30px rgba(0, 0, 0, .8), 0 0 0 1px rgba(255, 255, 255, .02); }
+.shot-bar { display: flex; align-items: center; gap: 6px; padding: 10px 14px; background: #10131c; border-bottom: 1px solid var(--border); }
+.shot-bar i { width: 10px; height: 10px; border-radius: 50%; background: #2a2f45; }
+.shot-bar i:nth-child(1) { background: #ff5f57; } .shot-bar i:nth-child(2) { background: #febc2e; } .shot-bar i:nth-child(3) { background: #28c840; }
+.shot-bar span { margin-left: 10px; font-size: .75rem; color: var(--muted); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.shot img { display: block; width: 100%; height: auto; }
+.shot figcaption, .phone-shot figcaption { padding: 12px 16px; font-size: .88rem; color: var(--muted); border-top: 1px solid var(--border); }
+.p-hero .shot { transform: perspective(1400px) rotateY(-6deg) rotateX(2deg); }
+
+/* Marco de celular */
+.phone-shot { margin: 0; text-align: center; }
+.phone-frame { display: inline-block; padding: 10px; border-radius: 34px; background: #05060a; border: 2px solid #2a2f45;
+  box-shadow: 0 30px 70px -30px rgba(139, 123, 255, .55); }
+.phone-frame img { display: block; width: 240px; height: auto; border-radius: 24px; }
+.phone-shot figcaption { border: 0; }
+
+/* Galería */
+.gallery { display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px; }
+.gallery.phones { grid-template-columns: repeat(3, 1fr); align-items: start; }
+
+/* Lista de funciones */
+.feat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.feat { padding: 22px; border-radius: var(--radius); border: 1px solid var(--border); background: linear-gradient(180deg, var(--surface-2), var(--surface)); }
+.feat-ic { font-size: 1.6rem; margin-bottom: 8px; }
+.feat h4 { margin: 0 0 6px; font-size: 1.05rem; }
+.feat p { margin: 0; color: var(--muted); font-size: .92rem; }
+
+/* Para quién */
+.who { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+.who span { padding: 8px 16px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); font-size: .92rem; }
+
+/* Caja de acceso a la demo */
+.demo-box { display: grid; grid-template-columns: 1.2fr 1fr; gap: 32px; align-items: center; padding: 40px; border-radius: 24px;
+  border: 1px solid var(--border);
+  background: radial-gradient(60% 120% at 100% 0%, color-mix(in srgb, var(--accent) 25%, transparent), transparent 70%), var(--surface); }
+.demo-box h2 { margin: 0 0 10px; font-size: clamp(1.5rem, 3.5vw, 2.2rem); letter-spacing: -.02em; }
+.creds { display: grid; gap: 10px; }
+.cred { display: flex; justify-content: space-between; gap: 12px; padding: 12px 16px; border-radius: 12px; background: #0e1119; border: 1px solid var(--border); font-size: .9rem; }
+.cred b { font-weight: 600; }
+.cred code { font-family: ui-monospace, Consolas, monospace; color: var(--accent2); }
+
+@media (max-width: 900px) {
+  .p-hero, .demo-box { grid-template-columns: 1fr; }
+  .p-hero .shot { transform: none; }
+  .gallery { grid-template-columns: 1fr; }
+  .gallery.phones { grid-template-columns: 1fr 1fr; }
+  .feat-grid { grid-template-columns: 1fr 1fr; }
+  .demo-box { padding: 28px 20px; }
+}
+@media (max-width: 560px) {
+  .feat-grid, .gallery.phones { grid-template-columns: 1fr; }
+  .cred { flex-direction: column; gap: 2px; }
+}
